@@ -1,0 +1,2 @@
+# schema
+Stackbit Schema Tools
