@@ -1,12 +1,10 @@
 const _ = require('lodash');
 const micromatch = require('micromatch');
-
-const { isSingleInstanceModel } = require('./model-utils');
 const {
     failFunctionWithTag,
     assertFunctionWithFail,
-    joinPathAndGlob
-} = require('./utils');
+} = require('@stackbit/utils');
+const { isSingleInstanceModel } = require('./model-utils');
 
 
 const fail = failFunctionWithTag('model-matcher');
@@ -93,4 +91,16 @@ function getModelsByQuery(query, models) {
                 && (_.isEmpty(exclude) || !micromatch.isMatch(filePath, exclude));
         }
     });
+}
+
+function joinPathAndGlob(pathStr, glob) {
+    glob = globToArray(glob);
+    return _.map(glob, (globPart) => _.compact([pathStr, globPart]).join('/'));
+}
+
+function globToArray(glob) {
+    return _.chain(glob).castArray().compact().reduce((accum, globPart) => {
+        const globParts = _.chain(globPart).trim('{}').split(',').compact().value();
+        return _.concat(accum, globParts)
+    }, []).value();
 }

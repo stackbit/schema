@@ -1,6 +1,12 @@
 const _ = require('lodash');
 
 const {
+    failFunctionWithTag,
+    assertFunctionWithFail,
+    rename
+} = require('@stackbit/utils');
+
+const {
     isModelField,
     isReferenceField,
     isCustomModelField,
@@ -11,11 +17,6 @@ const {
     iterateModelFieldsRecursively
 } = require('./model-utils');
 
-const {
-    failFunctionWithTag,
-    assertFunctionWithFail,
-    rename
-} = require('./utils');
 
 const extendModels = require('./model-extender');
 

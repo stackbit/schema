@@ -1,10 +1,9 @@
 const _ = require('lodash');
-
 const {
     failFunctionWithTag,
     assertFunctionWithFail,
     copyIfNotSet
-} = require('./utils');
+} = require('@stackbit/utils');
 
 
 const fail = failFunctionWithTag('model-extender');
