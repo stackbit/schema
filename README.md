@@ -21,13 +21,13 @@ models:
         name: title
         label: Title
         required: true
-      ...
+      # ...fields
   person:
     type: data
     label: Person
     folder: authors
     fields:
-      ...
+      # ...fields
 ```
 
 ```js
@@ -36,7 +36,7 @@ const models = loadModels(stackbitYaml.models);
 ```
 
 The returned `models` is a sanitized array of models:
-```json
+```js
 [
   {
     "name": "post",
@@ -45,14 +45,14 @@ The returned `models` is a sanitized array of models:
     "fieldLabel": "title",
     "layout": "post",
     "folder": "blog",
-    "fields": [ ... ]
+    "fields": [ /* fields */ ]
   },
   {
     "name": "person",
     "type": "data",
     "label": "Person",
     "folder": "authors",
-    "fields": [ ... ]
+    "fields": [ /* fields */ ]
   }
 ]
 ```
