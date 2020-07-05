@@ -1,5 +1,12 @@
-# schema
+# Stackbit Schema
+
 Stackbit schema tools
+
+## Install
+
+```bash
+npm install @stackbit/schema
+```
 
 ## Utility Functions
 
