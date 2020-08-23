@@ -28,7 +28,10 @@ module.exports = function loadModels(modelMap) {
     modelMap = _.cloneDeep(modelMap);
     let models = _.map(modelMap, (model, modelName) => {
         model.name = modelName;
-
+        return model;
+    });
+    models = extendModels(models);
+    _.forEach(models, model => {
         renameTemplateToLayout(model);
 
         iterateModelFieldsRecursively(model, (field, fieldPath) => {
@@ -59,10 +62,7 @@ module.exports = function loadModels(modelMap) {
                 assertFieldModels(field.items, modelMap, _.concat(fieldPath, 'items'));
             }
         });
-
-        return model;
     });
-    models = extendModels(models);
     models = removeUnusedModels(models);
     return models;
 }
