@@ -73,23 +73,20 @@ function getModelsByQuery(query, models) {
         }
         if (_.has(model, 'file')) {
             return micromatch.isMatch(filePath, model.file);
-        } else {
-            const folder = _.get(model, 'folder', '');
-            let match = _.get(model, 'match', '**/*');
-            let exclude = _.get(model, 'exclude', []);
-            match = joinPathAndGlob(folder, match);
-            exclude = joinPathAndGlob(folder, exclude);
-            exclude = _.concat(exclude, singleInstancePageFiles);
-            let typeMatch = true;
-            if (objectType) {
-                const modelType = _.get(model, modelTypeKeyPath);
-                assert(modelType, `model must define '${_.isArray(modelTypeKeyPath) ? modelTypeKeyPath.join('.') : modelTypeKeyPath}' field to match data, model: ${model.name}`);
-                typeMatch = (objectType === modelType);
-            }
-            return typeMatch
-                && micromatch.isMatch(filePath, match)
-                && (_.isEmpty(exclude) || !micromatch.isMatch(filePath, exclude));
         }
+        if (objectType) {
+            const modelType = _.get(model, modelTypeKeyPath);
+            assert(modelType, `model must define '${_.isArray(modelTypeKeyPath) ? modelTypeKeyPath.join('.') : modelTypeKeyPath}' field to match data, model: ${model.name}`);
+            return objectType === modelType;
+        }
+        const folder = _.get(model, 'folder', '');
+        let match = _.get(model, 'match', '**/*');
+        let exclude = _.get(model, 'exclude', []);
+        match = joinPathAndGlob(folder, match);
+        exclude = joinPathAndGlob(folder, exclude);
+        exclude = _.concat(exclude, singleInstancePageFiles);
+        return micromatch.isMatch(filePath, match) && (_.isEmpty(exclude) || !micromatch.isMatch(filePath, exclude));
+
     });
 }
 
