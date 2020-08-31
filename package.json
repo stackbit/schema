@@ -27,7 +27,7 @@
   "homepage": "https://github.com/stackbithq/schema#readme",
   "dependencies": {
     "@stackbit/utils": "^0.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "micromatch": "^4.0.2"
   }
 }
