@@ -74,9 +74,8 @@ function getModelsByQuery(query, models) {
         if (_.has(model, 'file')) {
             return micromatch.isMatch(filePath, model.file);
         }
-        if (objectType) {
+        if (objectType && _.has(model, modelTypeKeyPath)) {
             const modelType = _.get(model, modelTypeKeyPath);
-            assert(modelType, `model must define '${_.isArray(modelTypeKeyPath) ? modelTypeKeyPath.join('.') : modelTypeKeyPath}' field to match data, model: ${model.name}`);
             return objectType === modelType;
         }
         const folder = _.get(model, 'folder', '');
