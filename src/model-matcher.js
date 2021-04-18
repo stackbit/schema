@@ -2,13 +2,10 @@ const _ = require('lodash');
 const micromatch = require('micromatch');
 const {
     failFunctionWithTag,
-    assertFunctionWithFail,
 } = require('@stackbit/utils');
-const { isSingleInstanceModel } = require('./model-utils');
 
 
 const fail = failFunctionWithTag('model-matcher');
-const assert = assertFunctionWithFail(fail);
 
 module.exports = {
     getModelByQuery,
@@ -58,34 +55,56 @@ function getModelByQuery(query, models) {
  * @return {Array.<Object>} Array of stackbit.yaml models matching the `query`.
  */
 function getModelsByQuery(query, models) {
-    const singleInstancePageFiles = _.chain(models)
-        .filter(model => isSingleInstanceModel(model))
-        .map('file')
-        .value();
-
     const filePath = _.get(query, 'filePath');
     const objectType = _.get(query, 'type');
     const modelTypeKeyPath = _.get(query, 'modelTypeKeyPath');
 
-    return _.filter(models, model => {
-        if (_.has(model, 'singleInstance') && !_.has(model, 'file')) {
-            fail(`'${model.name}' is singleInstance but no file was specified`);
-        }
+    const modelMatchGroups = _.reduce(models, (modelGroups, model) => {
         if (_.has(model, 'file')) {
+            modelGroups.byFile.push(model);
+        } else if (objectType && _.has(model, modelTypeKeyPath)) {
+            modelGroups.byLayout.push(model);
+        } else {
+            modelGroups.byGlob.push(model);
+        }
+        return modelGroups;
+    }, {
+        byFile: [],
+        byLayout: [],
+        byGlob: []
+    });
+
+    const fileMatchedModels = _.filter(modelMatchGroups.byFile, model => {
+        if (!_.isString(model.file)) {
+            return false;
+        }
+        try {
             return micromatch.isMatch(filePath, model.file);
+        } catch (error) {
+            return false;
         }
-        if (objectType && _.has(model, modelTypeKeyPath)) {
-            const modelType = _.get(model, modelTypeKeyPath);
-            return objectType === modelType;
-        }
+    });
+
+    if (!_.isEmpty(fileMatchedModels)) {
+        return fileMatchedModels;
+    }
+
+    const layoutMatchedModels = _.filter(modelMatchGroups.byLayout, model => {
+        const modelType = _.get(model, modelTypeKeyPath);
+        return objectType === modelType;
+    });
+
+    if (!_.isEmpty(layoutMatchedModels)) {
+        return layoutMatchedModels;
+    }
+
+    return _.filter(modelMatchGroups.byGlob, model => {
         const folder = _.get(model, 'folder', '');
         let match = _.get(model, 'match', '**/*');
         let exclude = _.get(model, 'exclude', []);
         match = joinPathAndGlob(folder, match);
         exclude = joinPathAndGlob(folder, exclude);
-        exclude = _.concat(exclude, singleInstancePageFiles);
         return micromatch.isMatch(filePath, match) && (_.isEmpty(exclude) || !micromatch.isMatch(filePath, exclude));
-
     });
 }
 
